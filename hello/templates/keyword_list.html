@@ -1,0 +1,25 @@
+{% extends "hello_base.html" %}
+{% block title %}キーワードリスト{% endblock %}
+{% load static %}
+
+{% block body %}
+<div id="wrapper">
+  <div id="page-wrapper">
+    <div class="row">
+      <div class="col-lg-6 full-width margin-top-20percent" >
+        <div class="panel panel-default full-width">
+          <div class="panel-body full-width full-height">
+                {% for keyword in keyword_list %}
+                  <a href="{% url 'hello:keyword_edit' user.id keyword.pk %}">{{keyword.content}}</a>
+                {% empty %}
+                  <div>登録されたキーワードはありません。</div>
+                {% endfor %}
+          </div>
+          <a href="{% url 'hello:keyword_add' user.pk %}">キーワードを追加</a>
+          <a href="{% url 'hello:send_date' user.pk %}">メール通知日を確認</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

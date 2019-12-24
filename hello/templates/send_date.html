@@ -1,0 +1,29 @@
+{% extends "hello_base.html" %}
+{% block title %}メール通知日{% endblock %}
+{% load static %}
+
+{% block body %}
+<div id="wrapper">
+  <div id="page-wrapper">
+    <div class="row">
+      <div class="col-lg-6 full-width margin-top-20percent" >
+        <div class="panel panel-default full-width">
+          <div class="panel-body full-width full-height">
+            {% for when in whenemail_list %}
+              <div>発売日の{{ when.date_email }}日前にお知らせします</div>
+              {% if when.date_reminder %}
+                <div>直前のリマインダーは{{ when.date_reminder }}日前にお送りします</div>
+              {% endif %}
+              <a href="{% url 'hello:send_change' user.id when.pk %}">既存のメール通知日を変更</a>
+              <a href="{% url 'hello:send_delete' user.id when.pk %}">メール通知をしないようにする</a>
+            {% empty %}
+              <div>登録されたメール通知日設定はありません。</div>
+              <a href="{% url 'hello:send_set' user.pk %}">メール通知日を設定</a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

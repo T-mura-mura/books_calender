@@ -1,0 +1,22 @@
+{% extends "hello_base.html" %}
+{% block title %}メール通知日を消去{% endblock %}
+{% load static %}
+
+{% block body %}
+<div id="wrapper">
+  <div id="page-wrapper">
+    <div class="row">
+      <div class="col-lg-6 full-width margin-top-20percent" >
+        <div class="panel panel-default full-width">
+          <form method="POST">
+            {% csrf_token %}
+            <p>メール通知設定を削除しますか？</p>
+            <button type="submit">削除</button>
+            <a href="{% url 'hello:send_date' user.id %}">キャンセル</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

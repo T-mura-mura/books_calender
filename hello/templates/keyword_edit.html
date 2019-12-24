@@ -1,0 +1,25 @@
+{% extends "hello_base.html" %}
+{% block title %}キーワードを編集{% endblock %}
+{% load static %}
+
+{% block body %}
+<div id="wrapper">
+  <div id="page-wrapper">
+    <div class="row">
+      <div class="col-lg-6 full-width margin-top-20percent" >
+        <div class="panel panel-default full-width">
+          <form method="POST">
+            {% csrf_token %}
+            <table>
+              {{ form.as_table }}
+            </table>
+            <button type="submit">更新</button>
+            <a href="{% url 'hello:keyword_delete' user.id object.pk %}">削除</a>
+            <a href="{% url 'hello:keyword_list' user.pk %}">キャンセル</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

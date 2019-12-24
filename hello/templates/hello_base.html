@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}{% endblock %}</title>
+
+  </head>
+  <body>
+    <div id="wrapper">
+      {% if messages %}
+      {% for message in messages %}
+      <div>{{message}}</div>
+      {% endfor %}
+      {% endif %}
+      <nav class="navbar navbar-default navbar-static-top manager-nav no-margin" role="navigation">
+        <div class="navbar-default sidebar" role="navigation">
+          <div class="sidebar-nav navbar-collapse">
+              {% if user.is_authenticated %}
+              <p>{{ user.username }}さん、こんにちは。</p>
+                <a href="{% url 'hello:keyword_list' user.pk %}">キーワード一覧</a>
+                <a href="{% url 'hello:index' %}">本一覧</a>
+                <a href="{% url 'account_logout' %}"><i class="fa fa-bar-chart"></i>  ログアウト</a>
+              {% else %}
+              <p>こんにちは、来訪者さん。</p>
+              <a href="{% url 'account_signup' %}"><i class="fa fa-bar-chart"></i>  新規登録 </a>
+                <a href="{% url 'account_login' %}"><i class="fa fa-bar-chart"></i>  ログイン </a>
+              {% endif %}
+          </div>
+        </div>
+      </nav>
+      {% block body %}
+      {% endblock %}
+    </div>
+  </body>
+</html>

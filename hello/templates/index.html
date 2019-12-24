@@ -1,0 +1,39 @@
+{% extends "hello_base.html" %}
+{% block title %}Books発売日一覧{% endblock %}
+{% load static %}
+
+      {% block body %}
+      <div id="wrapper">
+        <div id="page-wrapper">
+          <div class="row">
+            <div class="col-lg-6 full-width margin-top-20percent" >
+              <div class="panel panel-default full-width">
+
+                <div class="panel-body full-width full-height">
+                  <table id="book-list-table" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline full-width">
+                    <thead>
+                      <tr>
+                        <th>タイトル</th>
+                        <th>著者</th>
+                        <th>出版社</th>
+                        <th>発売日</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for book in books %}
+                      <tr>
+                        <td>{{book.title}}</td>
+                        <td>{{book.author}}</td>
+                        <td>{{book.publisher}}</td>
+                        <td>{{book.publishing_date}}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endblock %}
