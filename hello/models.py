@@ -40,7 +40,6 @@ class SendingBooks(models.Model):
 class EmailLog(models.Model):
   """検索ヒットした本とユーザーへのメール送信履歴モデル"""
   user = models.ForeignKey(CustomUser, on_delete = models.DO_NOTHING)
-  keyword = models.ForeignKey(Keyword, on_delete = models.DO_NOTHING)
   title = models.CharField(max_length = 50)
   author = models.CharField(max_length = 50)
   is_email_1st = models.BooleanField(null = True)
