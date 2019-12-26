@@ -30,8 +30,9 @@ class SendingBooks(models.Model):
   title = models.CharField(max_length = 50)
   author = models.CharField(max_length = 50)
   publisher = models.CharField(max_length = 50)
-  publishing_date = models.DateField
-  is_send = models.BooleanField
+  publishing_date = models.DateField(null = True)
+  is_send_1st = models.BooleanField(null = True)
+  is_send_2nd = models.BooleanField(null = True)
 
   class Meta:
     verbose_name_plural = 'SendingBooks'
@@ -42,8 +43,8 @@ class EmailLog(models.Model):
   keyword = models.ForeignKey(Keyword, on_delete = models.DO_NOTHING)
   title = models.CharField(max_length = 50)
   author = models.CharField(max_length = 50)
-  is_email_1st = models.BooleanField
-  is_email_2nd = models.BooleanField
+  is_email_1st = models.BooleanField(null = True)
+  is_email_2nd = models.BooleanField(null = True)
   date_time_1st_email = models.DateTimeField(auto_now_add = True)
   date_time_2nd_email = models.DateTimeField(auto_now = True)
 
