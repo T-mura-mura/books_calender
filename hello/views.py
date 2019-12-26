@@ -21,7 +21,7 @@ import datetime
 class BooksListView(generic.TemplateView):
   template_name = "index.html"
 
-  def send_email_1st(self, name, email, books):
+  def send_email_1st(self, user, books):
     subject = '発売日が近い本があります'
     book_list = ''
     for book in books:
@@ -29,26 +29,48 @@ class BooksListView(generic.TemplateView):
       + '著者 : ' + book.author + '   ' + '出版社 : ' + book.publisher \
       + '   ' + '発売日 : ' + book.publishing_date.strftime('%Y/%m/%d') + '\n'
 
-    body = '次の本の発売日が近づいています。\n\n' + book_list
+    body = user.username + '様\n\n' + '次の本の発売日が近づいています。\n\n' + book_list
     from_email = 'admin@books-calender.com'
-    to = [ email ]
+    to = [ user.email ]
     message = EmailMessage(subject = subject, body = body,
     from_email = from_email, to = to)
     message.send()
 
-  def send_email_2nd(self, name, email, books):
+    for book in books:
+      log = EmailLog()
+      log.user = user
+      log.title = book.title
+      log.author = book.author
+      log.is_email_1st = True
+      log.save()
+
+  def send_email_2nd(self, user, books):
     subject = 'まもなく発売日となる本があります'
     book_list = ''
     for book in books:
       book_list += 'タイトル : ' + book.title + '   ' \
       + '著者 : ' + book.author + '   ' + '出版社 : ' + book.publisher \
       + '   ' + '発売日 : ' + book.publishing_date.strftime('%Y/%m/%d') + '\n'
-    body = '次の本はもうすぐ発売日です。\n\n' + book_list
+    body = user.username + '様\n\n' + '次の本はもうすぐ発売日です。\n\n' + book_list
     from_email = 'admin@books-calender.com'
-    to = [ email ]
+    to = [ user.email ]
     message = EmailMessage(subject = subject, body = body,
     from_email = from_email, to = to)
     message.send()
+
+    for book in books:
+      existing_log = EmailLog.objects.filter(user = user, \
+        title = book.title, author = book.author)
+      if existing_log:
+        existing_log[0].is_email_2nd = True
+        existing_log[0].save()
+      else:
+        log = EmailLog()
+        log.user = user
+        log.title = book.title
+        log.author = book.author
+        log.is_email_2nd = True
+        log.save()
 
   def check_if_send_1st(self, user, books):
     today = datetime.date.today()
@@ -61,8 +83,9 @@ class BooksListView(generic.TemplateView):
 
     for book in books:
       is_1st_sent = is_2nd_sent = False
-      if EmailLog.objects.filter(user = user, title = book.title):
-        log = EmailLog.objects.filter(user = user, title = book.title)
+      log = EmailLog.objects.filter(user = user, title = book.title, \
+        author = book.author)
+      if log:
         is_1st_sent = log[0].is_email_1st
         is_2nd_sent = log[0].is_email_2nd
 
@@ -90,8 +113,9 @@ class BooksListView(generic.TemplateView):
     if days2:
       for book in books:
         is_2nd_sent = False
-        if EmailLog.objects.filter(user = user, title = book.title):
-          log = EmailLog.objects.filter(user = user, title = book.title)
+        log = EmailLog.objects.filter(user = user, title = book.title, \
+        author = book.author)
+        if log:
           is_2nd_sent = log[0].is_email_2nd
 
         if (book.publishing_date - today >= days0):
@@ -158,9 +182,9 @@ class BooksListView(generic.TemplateView):
           books_1st = registers.filter(is_send_1st = True)
           books_2nd = registers.filter(is_send_2nd = True)
           if books_1st:
-            self.send_email_1st(user.username, user.email, books_1st)
+            self.send_email_1st(user, books_1st)
           if books_2nd:
-            self.send_email_2nd(user.username, user.email, books_2nd)
+            self.send_email_2nd(user, books_2nd)
 
     registers = SendingBooks.objects.all()
     registers.delete()
