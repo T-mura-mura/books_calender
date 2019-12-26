@@ -157,6 +157,12 @@ ACCOUNT_LOGOUT_ON_GET = True
 # とりあえず開発環境でメールの送信先をコンソールにするための設定
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# 日時のタイムゾーンを日本時間にする
+TIME_ZONE = 'Asia/Tokyo'
+
+# 言語設定を日本語にする
+LANGUAGE_CODE = 'ja'
+
 # LOGGING = {
 #     'version': 1,
 #     'disable_existing_loggers': False,
