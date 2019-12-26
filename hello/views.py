@@ -21,10 +21,30 @@ import datetime
 class BooksListView(generic.TemplateView):
   template_name = "index.html"
 
-  def send_email_1st(self, name, email, book):
+  def send_email_1st(self, name, email, books):
     subject = '発売日が近い本があります'
-    body = 'test message.' + name + ' ' + email + ' ' + book['title']
-    from_email = 'test@example.com'
+    book_list = ''
+    for book in books:
+      book_list += 'タイトル : ' + book.title + '   ' \
+      + '著者 : ' + book.author + '   ' + '出版社 : ' + book.publisher \
+      + '   ' + '発売日 : ' + book.publishing_date.strftime('%Y/%m/%d') + '\n'
+
+    body = '次の本の発売日が近づいています。\n\n' + book_list
+    from_email = 'admin@books-calender.com'
+    to = [ email ]
+    message = EmailMessage(subject = subject, body = body,
+    from_email = from_email, to = to)
+    message.send()
+
+  def send_email_2nd(self, name, email, books):
+    subject = 'まもなく発売日となる本があります'
+    book_list = ''
+    for book in books:
+      book_list += 'タイトル : ' + book.title + '   ' \
+      + '著者 : ' + book.author + '   ' + '出版社 : ' + book.publisher \
+      + '   ' + '発売日 : ' + book.publishing_date.strftime('%Y/%m/%d') + '\n'
+    body = '次の本はもうすぐ発売日です。\n\n' + book_list
+    from_email = 'admin@books-calender.com'
     to = [ email ]
     message = EmailMessage(subject = subject, body = body,
     from_email = from_email, to = to)
@@ -34,46 +54,51 @@ class BooksListView(generic.TemplateView):
     today = datetime.date.today()
     when = WhenEmail.objects.filter(user = user)
     days0 = datetime.timedelta(days = 0)
-    days1 = datetime.timedelta(days = when.date_email)
-    if when.date_reminder:
-      days2 = datetime.timedelta(days = when.date_reminder)
+    days1 = datetime.timedelta(days = when[0].date_email)
+    days2 = None
+    if when[0].date_reminder:
+      days2 = datetime.timedelta(days = when[0].date_reminder)
 
     for book in books:
       is_1st_sent = is_2nd_sent = False
-      if EmailLog.objects.filter(user = user, title = book['title']):
-        log = EmailLog.objects.filter(user = user, title = book['title'])
-        is_1st_sent = log.is_email_1st
-        is_2nd_sent = log.is_email_2nd
+      if EmailLog.objects.filter(user = user, title = book.title):
+        log = EmailLog.objects.filter(user = user, title = book.title)
+        is_1st_sent = log[0].is_email_1st
+        is_2nd_sent = log[0].is_email_2nd
 
-        if (book['publishing_date'] - today >= days0):
-          if (is_1st_sent is False and is_2nd_sent is False):
-            if days2:
-              if (book['publishing_date'] - today <= days1 and
-              book['publishing_date'] - today > days2):
-                return True
-            else:
-              if (book['publishing_date'] - today <= days1):
-                return True
+      if (book.publishing_date - today >= days0):
+        if (is_1st_sent is False and is_2nd_sent is False):
+          if days2:
+            if (book.publishing_date - today <= days1 and \
+            book.publishing_date - today > days2):
+              book.is_send_1st = True
+              book.save()
+          else:
+            if (book.publishing_date - today <= days1):
+              book.is_send_1st = True
+              book.save()
 
 
   def check_if_send_2nd(self, user, books):
     today = datetime.date.today()
     when = WhenEmail.objects.filter(user = user)
     days0 = datetime.timedelta(days = 0)
-    if when.date_reminder:
-      days2 = datetime.timedelta(days = when.date_reminder)
+    days2 = None
+    if when[0].date_reminder:
+      days2 = datetime.timedelta(days = when[0].date_reminder)
     
     if days2:
       for book in books:
         is_2nd_sent = False
-        if EmailLog.objects.filter(user = user, title = book['title']):
-          log = EmailLog.objects.filter(user = user, title = book['title'])
-          is_2nd_sent = log.is_email_2nd
+        if EmailLog.objects.filter(user = user, title = book.title):
+          log = EmailLog.objects.filter(user = user, title = book.title)
+          is_2nd_sent = log[0].is_email_2nd
 
-        if (book['publishing_date'] - today >= days0):
+        if (book.publishing_date - today >= days0):
           if (is_2nd_sent is False):
-            if (book['publishing_date'] - today <= days2):
-              return True
+            if (book.publishing_date - today <= days2):
+              book.is_send_2nd = True
+              book.save()
 
   def get(self, request, *args, **kwargs):
     html = requests.get('https://gagagabunko.jp/newrelease/index.html')
@@ -94,7 +119,7 @@ class BooksListView(generic.TemplateView):
       authors[i] = authors[i][0][2:-1]
     authors = authors[0:len(titles)]
     publisher = 'ガガガ文庫'
-    publishing_date = datetime.date(2019, 11, 19)
+    publishing_date = datetime.date(2019, 12, 30)
 
     books = []
     users = CustomUser.objects.all()
@@ -119,16 +144,26 @@ class BooksListView(generic.TemplateView):
               register.title = book['title']
               register.author = book['author']
               register.publisher = book['publisher']
-              register.publishing_date = datetime.datetime.strptime(book['publishing_date'], '%Y/%m/%d')
+              register.publishing_date = datetime.datetime. \
+              strptime(book['publishing_date'], '%Y/%m/%d')
               register.save()
               
     
     for user in users:
-      registers = SendingBooks.objects.filter(user = user)
-      if registers:
-        self.check_if_send_1st(user, registers)
-        self.check_if_send_2nd(user, registers)
-        self.send_email_1st(keyword.user.username, keyword.user.email, book)
+      if WhenEmail.objects.filter(user = user):
+        registers = SendingBooks.objects.filter(user = user)
+        if registers:
+          self.check_if_send_1st(user, registers)
+          self.check_if_send_2nd(user, registers)
+          books_1st = registers.filter(is_send_1st = True)
+          books_2nd = registers.filter(is_send_2nd = True)
+          if books_1st:
+            self.send_email_1st(user.username, user.email, books_1st)
+          if books_2nd:
+            self.send_email_2nd(user.username, user.email, books_2nd)
+
+    registers = SendingBooks.objects.all()
+    registers.delete()
 
     context = super(BooksListView, self).get_context_data(**kwargs)
     context['books'] = books
