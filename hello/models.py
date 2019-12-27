@@ -15,6 +15,7 @@ class Keyword(models.Model):
 
 
 class WhenEmail(models.Model):
+  """各ユーザー毎の、何日まえにメールを送るかを登録するモデル"""
   user = models.ForeignKey(CustomUser, unique=True,
   on_delete = models.CASCADE)
   date_email = models.IntegerField(default = 7,
@@ -25,7 +26,18 @@ class WhenEmail(models.Model):
   class Meta:
     verbose_name_plural = 'WhenEmail'
 
+class ShowingBooks(models.Model):
+  """ページに表示する本をデータベースに貯めるモデル"""
+  title = models.CharField(max_length = 50)
+  author = models.CharField(max_length = 50)
+  publisher = models.CharField(max_length = 50)
+  publishing_date = models.DateField(null = True)
+
+  class Meta:
+    verbose_name_plural = 'ShowingBooks'
+
 class SendingBooks(models.Model):
+  """登録キーワードにヒットした、メールで送る候補の本のモデル"""
   user = models.ForeignKey(CustomUser, on_delete = models.DO_NOTHING)
   title = models.CharField(max_length = 50)
   author = models.CharField(max_length = 50)
