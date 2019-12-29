@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '9%%*+v1*gmmw(-h)duanrz$t-ga^8uyezgpob!7ncj4lqxpq!^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -82,10 +82,21 @@ WSGI_APPLICATION = 'books_calender.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "books_calender",
+        "USER": os.environ.get('DB_USER'),
+        "PASSWORD": "",
+        "HOST": "localhost",
+        "PORT": "",
     }
 }
 
@@ -162,6 +173,19 @@ TIME_ZONE = 'Asia/Tokyo'
 
 # 言語設定を日本語にする
 LANGUAGE_CODE = 'ja'
+
+# 開発環境下では、開発環境下にのみ存在するlocal_settings.pyを読み込んで、
+# DEBUG = TRUEにする。本番環境では、local_settings.pyは無いので、
+# DEBUG = FALSEのままなので、if not以降が実行され、heroku用のセッティングが
+# 行われる。
+try:
+    from .local_settings import *
+except ImportError:
+    pass
+
+if not DEBUG:
+    import django_heroku
+    django_heroku.settings(locals())
 
 # LOGGING = {
 #     'version': 1,
