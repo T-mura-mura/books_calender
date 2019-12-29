@@ -156,17 +156,15 @@ AUTHENTICATION_BACKENDS = (
 
 # 一般ユーザー認証の設定
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_USERNAME_REQUIRED = False
 
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_REQUIRED = True
 
 LOGIN_REDIRECT_URL = 'hello:index'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'hello:index'
 
 ACCOUNT_LOGOUT_ON_GET = True
-
-# とりあえず開発環境でメールの送信先をコンソールにするための設定
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # 日時のタイムゾーンを日本時間にする
 TIME_ZONE = 'Asia/Tokyo'
