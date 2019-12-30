@@ -132,7 +132,7 @@ class Command(BaseCommand):
               book.is_send_2nd = True
               book.save()
 
-  @sched.scheduled_job('cron', hour=6)
+  @sched.scheduled_job('cron', hour=6, minute=5)
   def handle(self, *args, **options):
     deleting_books = ShowingBooks.objects.all()
     deleting_books.delete()
