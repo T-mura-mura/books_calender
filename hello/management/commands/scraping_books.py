@@ -5,6 +5,7 @@ from hello.models import Keyword, WhenEmail, EmailLog, SendingBooks, \
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 import requests
 from bs4 import BeautifulSoup
@@ -12,6 +13,8 @@ import re
 import datetime
 # cronを使うならこれは必要ないかも
 # import schedule
+
+sched = BlockingScheduler()
 
 class Command(BaseCommand):
   help = "１日１回、本の情報をスクレイピングして、データベースを更新する"
@@ -129,6 +132,7 @@ class Command(BaseCommand):
               book.is_send_2nd = True
               book.save()
 
+  @sched.scheduled_job('cron', hour=6)
   def handle(self, *args, **options):
     deleting_books = ShowingBooks.objects.all()
     deleting_books.delete()
@@ -193,3 +197,5 @@ class Command(BaseCommand):
 
     registers = SendingBooks.objects.all()
     registers.delete()
+
+sched.start()
