@@ -3,6 +3,9 @@ from accounts.models import CustomUser
 from hello.models import Keyword, WhenEmail, EmailLog, SendingBooks, \
   ShowingBooks
 from django.core.mail import EmailMessage
+import sendgrid
+import os
+from sendgrid.helpers.mail import *
 
 import requests
 from bs4 import BeautifulSoup
@@ -15,7 +18,7 @@ class Command(BaseCommand):
   help = "１日１回、本の情報をスクレイピングして、データベースを更新する"
 
   def send_email_1st(self, user, books):
-    subject = '発売日が近い本があります'
+    # subject = '発売日が近い本があります'
     book_list = ''
     for book in books:
       book_list += 'タイトル : ' + book.title + '   ' \
@@ -23,14 +26,21 @@ class Command(BaseCommand):
       + '   ' + '発売日 : ' + book.publishing_date.strftime('%Y/%m/%d') + '\n'
 
     body = user.username + '様\n\n' + '次の本の発売日が近づいています。\n\n' + book_list
-    from_email = 'admin@books-calender.com'
-    to = [ user.email ]
-    message = EmailMessage(subject = subject, body = body,
-    from_email = from_email, to = to)
-    check = None
-    check = message.send()
+    # from_email = 'admin@books-calender.com'
+    # to = [ user.email ]
+    # message = EmailMessage(subject = subject, body = body,
+    # from_email = from_email, to = to)
+    # check = None
+    # check = message.send()
+    sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+    from_email = Email("admin@books-calender.com")
+    subject = "発売日が近い本があります"
+    to_email = Email(user.email)
+    content = Content("text/plain", body)
+    mail = Mail(from_email, subject, to_email, content)
+    response = sg.client.mail.send.post(request_body=mail.get())
 
-    if check:
+    if response:
       for book in books:
         log = EmailLog()
         log.user = user
