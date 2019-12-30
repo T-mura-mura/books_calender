@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 from accounts.models import CustomUser
 from hello.models import Keyword, WhenEmail, EmailLog, SendingBooks, \
   ShowingBooks
-from django.core.mail import EmailMessage
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -18,30 +17,21 @@ class Command(BaseCommand):
   help = "１日１回、本の情報をスクレイピングして、データベースを更新する"
 
   def send_email_1st(self, user, books):
-    # subject = '発売日が近い本があります'
+    subject = "発売日が近い本があります"
     book_list = ''
     for book in books:
       book_list += 'タイトル : ' + book.title + '   ' \
       + '著者 : ' + book.author + '   ' + '出版社 : ' + book.publisher \
-      + '   ' + '発売日 : ' + book.publishing_date.strftime('%Y/%m/%d') + '\n'
+      + '   ' + '発売日 : ' + book.publishing_date.strftime('%Y/%m/%d') + '\n\n'
 
     body = user.username + '様\n\n' + '次の本の発売日が近づいています。\n\n' + book_list
-    # from_email = 'admin@books-calender.com'
-    # to = [ user.email ]
-    # message = EmailMessage(subject = subject, body = body,
-    # from_email = from_email, to = to)
-    # check = None
-    # check = message.send()
     from_email = "admin@books-calender.com"
-    subject = "発売日が近い本があります"
     to_email = user.email
     mail = Mail(from_email, to_email, subject, body)
+    response = None
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(mail)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
     except Exception as e:
         print(str(e))
 
@@ -60,16 +50,19 @@ class Command(BaseCommand):
     for book in books:
       book_list += 'タイトル : ' + book.title + '   ' \
       + '著者 : ' + book.author + '   ' + '出版社 : ' + book.publisher \
-      + '   ' + '発売日 : ' + book.publishing_date.strftime('%Y/%m/%d') + '\n'
+      + '   ' + '発売日 : ' + book.publishing_date.strftime('%Y/%m/%d') + '\n\n'
     body = user.username + '様\n\n' + '次の本はもうすぐ発売日です。\n\n' + book_list
     from_email = 'admin@books-calender.com'
-    to = [ user.email ]
-    message = EmailMessage(subject = subject, body = body,
-    from_email = from_email, to = to)
-    check = None
-    check = message.send()
+    to_email = user.email
+    mail = Mail(from_email, to_email, subject, body)
+    response = None
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(mail)
+    except Exception as e:
+        print(str(e))
 
-    if check:
+    if response:
       for book in books:
         existing_log = EmailLog.objects.filter(user = user, \
           title = book.title, author = book.author)
