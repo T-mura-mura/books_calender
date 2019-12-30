@@ -153,7 +153,7 @@ class Command(BaseCommand):
       authors[i] = authors[i][0][2:-1]
     authors = authors[0:len(titles)]
     publisher = 'ガガガ文庫'
-    publishing_date = datetime.date(2019, 12, 30)
+    publishing_date = datetime.date(2020, 1, 6)
 
     for i in range(len(titles)):
       book = ShowingBooks()
