@@ -3,9 +3,9 @@ from accounts.models import CustomUser
 from hello.models import Keyword, WhenEmail, EmailLog, SendingBooks, \
   ShowingBooks
 from django.core.mail import EmailMessage
-import sendgrid
 import os
-from sendgrid.helpers.mail import *
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 import requests
 from bs4 import BeautifulSoup
@@ -32,13 +32,18 @@ class Command(BaseCommand):
     # from_email = from_email, to = to)
     # check = None
     # check = message.send()
-    sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
-    from_email = Email("admin@books-calender.com")
+    from_email = "admin@books-calender.com"
     subject = "発売日が近い本があります"
-    to_email = Email(user.email)
-    content = Content("text/plain", body)
-    mail = Mail(from_email, subject, to_email, content)
-    response = sg.client.mail.send.post(request_body=mail.get())
+    to_email = user.email
+    mail = Mail(from_email, to_email, subject, body)
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(mail)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(str(e))
 
     if response:
       for book in books:
