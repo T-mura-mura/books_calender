@@ -156,7 +156,6 @@ AUTHENTICATION_BACKENDS = (
 
 # 一般ユーザー認証の設定
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_USERNAME_REQUIRED = False
 
 # 今の所'mandatory'だとログイン時にエラーになる
 #ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
