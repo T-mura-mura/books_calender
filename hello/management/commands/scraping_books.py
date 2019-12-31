@@ -10,8 +10,6 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import datetime
-# cronを使うならこれは必要ないかも
-# import schedule
 
 
 class Command(BaseCommand):
@@ -84,7 +82,7 @@ class Command(BaseCommand):
     days0 = datetime.timedelta(days = 0)
     days1 = datetime.timedelta(days = when[0].date_email)
     days2 = None
-    if when[0].date_reminder:
+    if when[0].date_reminder != None:
       days2 = datetime.timedelta(days = when[0].date_reminder)
 
     for book in books:
@@ -97,7 +95,7 @@ class Command(BaseCommand):
 
       if (book.publishing_date - today >= days0):
         if (is_1st_sent is False and is_2nd_sent is False):
-          if days2:
+          if days2 != None:
             if (book.publishing_date - today <= days1 and \
             book.publishing_date - today > days2):
               book.is_send_1st = True
@@ -113,10 +111,10 @@ class Command(BaseCommand):
     when = WhenEmail.objects.filter(user = user)
     days0 = datetime.timedelta(days = 0)
     days2 = None
-    if when[0].date_reminder:
+    if when[0].date_reminder != None:
       days2 = datetime.timedelta(days = when[0].date_reminder)
     
-    if days2:
+    if days2 != None:
       for book in books:
         is_2nd_sent = False
         log = EmailLog.objects.filter(user = user, title = book.title, \

@@ -10,9 +10,17 @@
         <div class="panel panel-default full-width">
           <div class="panel-body full-width full-height">
             {% for when in whenemail_list %}
-              <div>発売日の{{ when.date_email }}日前にお知らせします</div>
-              {% if when.date_reminder %}
-                <div>直前のリマインダーは{{ when.date_reminder }}日前にお送りします</div>
+              {% if when.date_email == 0 %}
+                <div>キーワードに合致する本の発売を、発売日当日にお知らせします</div>
+              {% else %}
+                <div>キーワードに合致する本の発売を、発売日の{{ when.date_email }}日前にお知らせします</div>
+              {% endif %}
+              {% if when.date_reminder != None %}
+                {% if when.date_reminder == 0 %}
+                  <div>直前のリマインダーは発売日当日にお送りします</div>
+                {% else %}
+                  <div>直前のリマインダーは発売の{{ when.date_reminder }}日前にお送りします</div>
+                {% endif %}
               {% endif %}
               <a href="{% url 'hello:send_change' user.id when.pk %}">既存のメール通知日を変更</a>
               <a href="{% url 'hello:send_delete' user.id when.pk %}">メール通知をしないようにする</a>
