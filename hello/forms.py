@@ -5,11 +5,13 @@ class KeywordAddForm(forms.ModelForm):
   class Meta:
     model = Keyword
     fields = ('content',)
+    labels = { 'content': '検索する言葉' }
 
 class WhenEmailAddForm(forms.ModelForm):
   class Meta:
     model = WhenEmail
     fields = ('date_email', 'date_reminder',)
+    labels = { 'date_email': '１通目のメール', 'date_reminder': 'リマインダー' }
 
   def clean(self):
     cleaned_data = super().clean()
