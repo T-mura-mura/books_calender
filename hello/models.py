@@ -45,6 +45,7 @@ class SendingBooks(models.Model):
   publishing_date = models.DateField(null = True)
   is_send_1st = models.BooleanField(null = True)
   is_send_2nd = models.BooleanField(null = True)
+  is_overlapping = models.BooleanField(default = False)
 
   class Meta:
     verbose_name_plural = 'SendingBooks'

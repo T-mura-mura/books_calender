@@ -128,21 +128,24 @@ class Command(BaseCommand):
               book.is_send_2nd = True
               book.save()
 
-  def handle(self, *args, **options):
-    deleting_books = ShowingBooks.objects.all()
-    deleting_books.delete()
+  def check_unique(self, books):
+    for i in range(len(books)-1):
+      for j in range(i+1, len(books)):
+        if books[i].title == books[j].title:
+          books[j].is_overlapping = True
 
+  def scraping_gagaga(self):
     html = requests.get('https://gagagabunko.jp/newrelease/index.html')
     soup = BeautifulSoup(html.content, "html.parser")
     
-    titles = soup.select("h3.blueBold")
-    authors_pri = soup.select("span.textsize14")
-    authors = authors_pri[0::2]
+    titles = soup.select("#contBg2 > div > h3")
+    authors = soup.select("#contBg2 > div > p")
+
     for i in range(len(titles)):
       titles[i] = titles[i].string
       # titleがうまくとれなくてNoneになったときの処置----
       if titles[i] == None:
-        titles[i] = '#'
+        titles[i] = '取得失敗。出版社公式ホームページをご覧ください'
       # -------------------------------------------
     for i in range(len(authors)):
       authors[i] = authors[i].string
@@ -150,7 +153,15 @@ class Command(BaseCommand):
       authors[i] = authors[i][0][2:-1]
     authors = authors[0:len(titles)]
     publisher = 'ガガガ文庫'
-    publishing_date = datetime.date(2020, 1, 6)
+    pub_day = soup.select("#contBg2 > div.heading > \
+    span.headingReleasedate")[0].string
+    pub_day = re.findall(r'\d月\d+日', pub_day)
+    pub_day_month = re.sub(r'月\d+日', '', pub_day[0])
+    pub_day_proc = re.sub(r'\d月', '', pub_day[0])
+    pub_day_day = re.sub(r'日', '', pub_day_proc)
+    pub_day_month = int(pub_day_month)
+    pub_day_day = int(pub_day_day)
+    publishing_date = datetime.date(2020, pub_day_month, pub_day_day)
 
     for i in range(len(titles)):
       book = ShowingBooks()
@@ -159,6 +170,13 @@ class Command(BaseCommand):
       book.publisher = publisher
       book.publishing_date = publishing_date
       book.save()
+
+
+  def handle(self, *args, **options):
+    deleting_books = ShowingBooks.objects.all()
+    deleting_books.delete()
+
+    self.scraping_gagaga()
 
     users = CustomUser.objects.all()
     books = ShowingBooks.objects.all()
@@ -181,14 +199,17 @@ class Command(BaseCommand):
       if WhenEmail.objects.filter(user = user):
         registers = SendingBooks.objects.filter(user = user)
         if registers:
+          self.check_unique(registers)
           self.check_if_send_1st(user, registers)
           self.check_if_send_2nd(user, registers)
-          books_1st = registers.filter(is_send_1st = True)
-          books_2nd = registers.filter(is_send_2nd = True)
+          books_1st = registers.filter(is_send_1st = True, \
+            is_overlapping = False)
+          books_2nd = registers.filter(is_send_2nd = True, \
+            is_overlapping = False)
           if books_1st:
             self.send_email_1st(user, books_1st)
           if books_2nd:
             self.send_email_2nd(user, books_2nd)
 
-    registers = SendingBooks.objects.all()
-    registers.delete()
+    # registers = SendingBooks.objects.all()
+    # registers.delete()
