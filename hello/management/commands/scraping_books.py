@@ -171,12 +171,57 @@ class Command(BaseCommand):
       book.publishing_date = publishing_date
       book.save()
 
+  def scraping_overlap(self):
+    html = requests.get('https://over-lap.co.jp/lnv/')
+    soup = BeautifulSoup(html.content, "html.parser")
+    titles = soup.select("#lightnovel_next h2 > a")
+    authors = soup.select("#lightnovel_next span:nth-child(1) > strong")
+    pub_day = soup.select("#lightnovel_next small.info > span")
+
+    for i in range(len(titles)):
+      titles[i] = titles[i].string
+      titles[i] = re.sub(r'\r|\n|\s{2,}', '', titles[i])
+
+    for i in range(len(authors)):
+      authors[i] = authors[i].string
+
+    pub_day_year = [None] * len(pub_day)
+    pub_day_month = [None] * len(pub_day)
+    pub_day_day = [None] * len(pub_day)
+    publishing_date = [None] * len(pub_day)
+    for i in range(len(pub_day)):
+      pub_day[i] = pub_day[i].string
+      pub_day_year[i] = re.findall(r'\d+年', pub_day[i])
+      pub_day_year[i] = re.sub(r'年', '', pub_day_year[i][0])
+      pub_day_month[i] = re.findall(r'\d+月', pub_day[i])
+      pub_day_month[i] = re.sub(r'月', '', pub_day_month[i][0])
+      pub_day_day[i] = re.findall(r'\d+日', pub_day[i])
+      pub_day_day[i] = re.sub(r'日', '', pub_day_day[i][0])
+
+      pub_day_year[i] = int(pub_day_year[i])
+      pub_day_month[i] = int(pub_day_month[i])
+      pub_day_day[i] = int(pub_day_day[i])
+
+      publishing_date[i] = datetime.date(pub_day_year[i], pub_day_month[i], \
+        pub_day_day[i])
+
+    publisher = 'オーバーラップ文庫'
+
+    for i in range(len(titles)):
+      book = ShowingBooks()
+      book.title = titles[i]
+      book.author = authors[i]
+      book.publisher = publisher
+      book.publishing_date = publishing_date[i]
+      book.save()
+
 
   def handle(self, *args, **options):
     deleting_books = ShowingBooks.objects.all()
     deleting_books.delete()
 
     self.scraping_gagaga()
+    self.scraping_overlap()
 
     users = CustomUser.objects.all()
     books = ShowingBooks.objects.all()
