@@ -38,6 +38,9 @@ class EmailEditForm(forms.ModelForm):
 
   def clean_email(self):
     email = self.cleaned_data['email']
+    is_email_another = CustomUser.objects.filter(email = email)
     if not email:
       raise forms.ValidationError('メールアドレスを入力してください')
+    if is_email_another:
+      raise forms.ValidationError('他のユーザーが既に使用しているメールアドレスです')
     return email
