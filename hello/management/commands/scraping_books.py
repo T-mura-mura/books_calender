@@ -131,7 +131,11 @@ class Command(BaseCommand):
   def check_unique(self, books):
     for i in range(len(books)-1):
       for j in range(i+1, len(books)):
-        if books[i].title == books[j].title:
+        if books[i].title == books[j].title and \
+          books[i].author == books[j].author and \
+          books[i].publisher == books[j].publisher and \
+          books[i].publishing_date == books[j].publishing_date:
+
           books[j].is_overlapping = True
 
   def scraping_gagaga(self):
@@ -145,7 +149,7 @@ class Command(BaseCommand):
       titles[i] = titles[i].string
       # titleがうまくとれなくてNoneになったときの処置----
       if titles[i] == None:
-        titles[i] = '取得失敗。出版社公式ホームページをご覧ください'
+        titles[i] = '<取得失敗> 公式ホームページをご覧ください'
       # -------------------------------------------
     for i in range(len(authors)):
       authors[i] = authors[i].string
@@ -164,12 +168,16 @@ class Command(BaseCommand):
     publishing_date = datetime.date(2020, pub_day_month, pub_day_day)
 
     for i in range(len(titles)):
-      book = ShowingBooks()
-      book.title = titles[i]
-      book.author = authors[i]
-      book.publisher = publisher
-      book.publishing_date = publishing_date
-      book.save()
+      if not ShowingBooks.objects.filter(title = titles[i], \
+        author = authors[i], publisher = publisher, \
+        publishing_date = publishing_date):
+        
+        book = ShowingBooks()
+        book.title = titles[i]
+        book.author = authors[i]
+        book.publisher = publisher
+        book.publishing_date = publishing_date
+        book.save()
 
   def scraping_overlap(self):
     html = requests.get('https://over-lap.co.jp/lnv/')
@@ -208,17 +216,26 @@ class Command(BaseCommand):
     publisher = 'オーバーラップ文庫'
 
     for i in range(len(titles)):
-      book = ShowingBooks()
-      book.title = titles[i]
-      book.author = authors[i]
-      book.publisher = publisher
-      book.publishing_date = publishing_date[i]
-      book.save()
+      if not ShowingBooks.objects.filter(title = titles[i], \
+        author = authors[i], publisher = publisher, \
+        publishing_date = publishing_date[i]):
+
+        book = ShowingBooks()
+        book.title = titles[i]
+        book.author = authors[i]
+        book.publisher = publisher
+        book.publishing_date = publishing_date[i]
+        book.save()
 
 
   def handle(self, *args, **options):
-    deleting_books = ShowingBooks.objects.all()
-    deleting_books.delete()
+
+    showing_books = ShowingBooks.objects.all()
+    today = datetime.date.today()
+    days0 = datetime.timedelta(days = 0)
+    for book in showing_books:
+      if book.publishing_date - today < days0:
+        book.delete()
 
     self.scraping_gagaga()
     self.scraping_overlap()
@@ -256,5 +273,5 @@ class Command(BaseCommand):
           if books_2nd:
             self.send_email_2nd(user, books_2nd)
 
-    # registers = SendingBooks.objects.all()
-    # registers.delete()
+    registers = SendingBooks.objects.all()
+    registers.delete()
