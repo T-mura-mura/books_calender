@@ -1,5 +1,6 @@
 from django import forms
 from .models import Keyword, WhenEmail
+from accounts.models import CustomUser
 
 class KeywordAddForm(forms.ModelForm):
   class Meta:
@@ -28,3 +29,15 @@ class WhenEmailAddForm(forms.ModelForm):
     if days_2nd != None and days_1st <= days_2nd:
       raise forms.ValidationError('リマインダーは１回目のお知らせメールより \
         後に届くよう、小さな数字を選んでください')
+
+class EmailEditForm(forms.ModelForm):
+  class Meta:
+    model = CustomUser
+    fields = ('email',)
+    labels = { 'email': '新しいメールアドレス' }
+
+  def clean_email(self):
+    email = self.cleaned_data['email']
+    if not email:
+      raise forms.ValidationError('メールアドレスを入力してください')
+    return email

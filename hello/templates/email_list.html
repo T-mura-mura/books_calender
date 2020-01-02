@@ -1,0 +1,24 @@
+{% extends "hello_base.html" %}
+{% block title %}Email表示{% endblock %}
+{% load static %}
+
+{% block body %}
+<div id="wrapper">
+  <div id="page-wrapper">
+    <div class="row">
+      <div class="col-lg-6 full-width margin-top-20percent" >
+        <div class="panel panel-default full-width">
+          <div class="panel-body full-width full-height">
+                {% for emailuser in customuser_list %}
+                <p>現在のメールアドレス:</p>
+                <div>{{emailuser.email}}</div>
+                <a href="{% url 'hello:email_edit' user.id emailuser.pk %}">メールアドレスを変更</a>
+                {% endfor %}
+          </div>
+          <a href="{% url 'hello:send_date' user.pk %}">メール通知日を確認</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -22,4 +22,8 @@ urlpatterns = [
   name="send_change"),
   path('<int:id>/send_delete/<int:pk>/', views.SendDeleteView.as_view(),
   name="send_delete"),
+  path('<int:pk>/email_list/', views.EmailListView.as_view(),
+  name="email_list"),
+  path('<int:id>/email_edit/<int:pk>/', views.EmailEditView.as_view(),
+  name="email_edit"),
 ]

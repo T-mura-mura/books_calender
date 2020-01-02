@@ -25,6 +25,7 @@
               <p>{{ user.username }}さん、こんにちは。</p>
                 <a href="{% url 'hello:keyword_list' user.pk %}">キーワード一覧</a>
                 <a href="{% url 'hello:index' %}">本一覧</a>
+                <a href="{% url 'hello:email_list' user.id %}">メールアドレス編集</a>
                 <a href="{% url 'account_logout' %}"><i class="fa fa-bar-chart"></i>  ログアウト</a>
               {% else %}
               <p>こんにちは、来訪者さん。</p>

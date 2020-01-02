@@ -4,8 +4,10 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 # from django.http import HttpResponseRedirect
 
+from accounts.models import CustomUser
+from allauth.account.models import EmailAddress
 from .models import Keyword, WhenEmail, ShowingBooks
-from .forms import KeywordAddForm, WhenEmailAddForm
+from .forms import KeywordAddForm, WhenEmailAddForm, EmailEditForm
 
 
 
@@ -141,3 +143,33 @@ class SendDeleteView(LoginRequiredMixin, generic.DeleteView):
   def get_success_url(self):
     return reverse_lazy('hello:send_date',
     kwargs={'pk': self.request.user.pk })
+
+class EmailListView(LoginRequiredMixin, generic.ListView):
+  model = CustomUser
+  template_name = 'email_list.html'
+
+  def get_queryset(self):
+    user_for_email = CustomUser.objects.filter(id = self.request.user.id)
+    return user_for_email
+
+class EmailEditView(LoginRequiredMixin, generic.UpdateView):
+  model = CustomUser
+  template_name = 'email_edit.html'
+  form_class = EmailEditForm
+
+  def get_success_url(self):
+    return reverse_lazy('hello:index')
+
+  def form_valid(self, form):
+    try:
+        email_address = EmailAddress.objects.get(user = self.request.user)
+        email_address.delete()
+    except EmailAddress.DoesNotExist:
+        pass
+
+    messages.success(self.request, 'メールアドレスを登録しました')
+    return super().form_valid(form)
+
+  def form_invalid(self, form):
+    messages.error(self.request, 'メールアドレス更新に失敗しました')
+    return super().form_invalid(form)

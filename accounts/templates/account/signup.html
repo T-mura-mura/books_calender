@@ -1,21 +1,29 @@
-{% extends "account/base.html" %}
+<!DOCTYPE html>
 
-{% load i18n %}
+<html lang="ja">
 
-{% block head_title %}{% trans "Signup" %}{% endblock %}
+  <head>
 
-{% block content %}
-<h1>{% trans "Sign Up" %}</h1>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-<p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+    <title>Login</title>
 
-<form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %}
-  <button type="submit">{% trans "Sign Up" %} &raquo;</button>
-</form>
+  </head>
 
-{% endblock %}
+  <body>
+    <h1>ユーザー新規登録</h1>
+    <p>すでにアカウントをお持ちの方はこちらから<a href="{{ login_url }}">ログイン</a>してください</p>
+    <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+      {% endif %}
+      <button type="submit">登録 &raquo;</button>
+    </form>
+  </body>
+</html>
