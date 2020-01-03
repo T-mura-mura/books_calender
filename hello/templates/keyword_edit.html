@@ -14,7 +14,6 @@
               {{ form.as_table }}
             </table>
             <button type="submit">更新</button>
-            <a href="{% url 'hello:keyword_delete' user.id object.pk %}">削除</a>
             <a href="{% url 'hello:keyword_list' user.pk %}">キャンセル</a>
           </form>
         </div>

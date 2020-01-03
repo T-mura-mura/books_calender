@@ -1,0 +1,17 @@
+@for $value from 0 through 500 {
+  .keyword_cage#{$value} label {
+    cursor: pointer;
+    color: #0000ff;
+    text-decoration: underline;
+  }
+  #keyword_hidden_checkbox#{$value} {
+    display: none;
+  }
+  #keyword_hidden_checkbox#{$value} + .keyword_menu#{$value} {
+    display: none;
+  }
+  #keyword_hidden_checkbox#{$value}:checked + .keyword_menu#{$value} {
+    display: block;
+    list-style: none;
+  }
+}

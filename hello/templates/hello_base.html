@@ -2,11 +2,13 @@
 <html lang="ja">
   <head>
     {% load static %}
+    {% load sass_tags %}
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{% sass_src 'hello/keyword_list.scss' %}">
 
     <title>{% block title %}{% endblock %}</title>
 

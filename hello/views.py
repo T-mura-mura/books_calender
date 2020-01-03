@@ -2,7 +2,7 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
-# from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 
 from accounts.models import CustomUser
 from allauth.account.models import EmailAddress
@@ -68,24 +68,13 @@ class KeywordEditView(LoginRequiredMixin, generic.UpdateView):
     messages.error(self.request, 'キーワード登録に失敗しました')
     return super().form_invalid(form)
 
-class KeywordDeleteView(LoginRequiredMixin, generic.DeleteView):
-  model = Keyword
-  template_name = 'keyword_delete.html'
-  
-  def delete(self, request, *args, **kwargs):
-    messages.success(self.request, "キーワードを削除しました")
-    return super().delete(request, *args, **kwargs)
 
-  def get_success_url(self):
-    return reverse_lazy('hello:keyword_list',
-    kwargs={'pk': self.request.user.pk })
-
-# うまく動かないdeleteメソッド。できたらdeleteする時に確認なしで消したい。
-# def keyword_delete(self, id):
-#   Keyword.objects.filter(id = self.request.object.id).delete()
-#   redirect_url = reverse_lazy('hello:keyword_list',
-#     kwargs={'pk': self.request.user.id })
-#   return HttpResponseRedirect(redirect_url)
+def keyword_ajax_delete(request):
+  keyword_id_pri = request.POST.getlist("keyword_id")
+  keyword_id = keyword_id_pri[0]
+  del_obj = Keyword.objects.filter(id = keyword_id)
+  del_obj.delete()
+  return HttpResponse(keyword_id)
 
 class SendDateView(LoginRequiredMixin, generic.ListView):
   model = WhenEmail
