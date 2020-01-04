@@ -1,12 +1,7 @@
 from django import forms
-from .models import Keyword, WhenEmail
+from .models import WhenEmail
 from accounts.models import CustomUser
 
-class KeywordAddForm(forms.ModelForm):
-  class Meta:
-    model = Keyword
-    fields = ('content',)
-    labels = { 'content': '検索する言葉' }
 
 class WhenEmailAddForm(forms.ModelForm):
   class Meta:

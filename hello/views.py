@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from accounts.models import CustomUser
 from allauth.account.models import EmailAddress
 from .models import Keyword, WhenEmail, ShowingBooks
-from .forms import KeywordAddForm, WhenEmailAddForm, EmailEditForm
+from .forms import WhenEmailAddForm, EmailEditForm
 
 
 
@@ -31,43 +31,33 @@ class KeywordsListView(LoginRequiredMixin, generic.ListView):
     return keywords
 
 
-class KeywordAddView(LoginRequiredMixin, generic.CreateView):
-  model = Keyword
-  template_name = 'keyword_add.html'
-  form_class = KeywordAddForm
+def keyword_ajax_add(request):
+  keyword_content_pri = request.POST.getlist("keyword_content")
+  keyword_content = keyword_content_pri[0]
+  add_obj = Keyword()
+  if keyword_content:
+    add_obj.user = request.user
+    add_obj.content = keyword_content
+    add_obj.save()
+    keyword_id = add_obj.pk
+  else:
+    keyword_id = None
 
-  def get_success_url(self):
-    return reverse_lazy('hello:keyword_list',
-    kwargs={'pk': self.request.user.pk })
+  return HttpResponse(keyword_id)
 
-  def form_valid(self, form):
-    keyword = form.save(commit = False)
-    keyword.user = self.request.user
-    keyword.save()
-    messages.success(self.request, 'キーワードを登録しました')
-    return super().form_valid(form)
+def keyword_ajax_update(request):
+  keyword_id_pri = request.POST.getlist("keyword_id")
+  keyword_id = keyword_id_pri[0]
+  keyword_content_pri = request.POST.getlist("keyword_content")
+  keyword_content = keyword_content_pri[0]
+  upd_obj = Keyword.objects.get(id = keyword_id)
+  if keyword_content:
+    upd_obj.content = keyword_content
+    upd_obj.save()
+  else:
+    upd_obj.delete()
 
-  def form_invalid(self, form):
-    messages.error(self.request, 'キーワード登録に失敗しました')
-    return super().form_invalid(form)
-
-class KeywordEditView(LoginRequiredMixin, generic.UpdateView):
-  model = Keyword
-  template_name = 'keyword_edit.html'
-  form_class = KeywordAddForm
-
-  def get_success_url(self):
-    return reverse_lazy('hello:keyword_list',
-    kwargs={'pk': self.request.user.pk })
-
-  def form_valid(self, form):
-    messages.success(self.request, 'キーワードを登録しました')
-    return super().form_valid(form)
-
-  def form_invalid(self, form):
-    messages.error(self.request, 'キーワード登録に失敗しました')
-    return super().form_invalid(form)
-
+  return HttpResponse(keyword_content)
 
 def keyword_ajax_delete(request):
   keyword_id_pri = request.POST.getlist("keyword_id")

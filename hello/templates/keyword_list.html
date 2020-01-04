@@ -8,18 +8,23 @@
     <div class="row">
       <div class="col-lg-6 full-width margin-top-20percent" >
         <div class="panel panel-default full-width">
-          <div class="panel-body full-width full-height">
+          <div class="keywords_board">
                 {% for keyword in keyword_list %}
                   <div class="keyword_cage{{keyword.pk}}">
                   <label for="keyword_hidden_checkbox{{keyword.pk}}">{{keyword.content}}</label>
                   <input type="checkbox" id="keyword_hidden_checkbox{{keyword.pk}}">
                   <ul class="keyword_menu{{keyword.pk}}">
-                    <li>「<strong>{{keyword.content}}</strong>」を編集しますか？</li>
+                    <li class="keyword_questioning{{keyword.pk}}">「<strong>{{keyword.content}}</strong>」を編集しますか？</li>
                     <li>
-                      <a href="{% url 'hello:keyword_edit' user.id keyword.pk %}">編集</a>
+                      <form data-keyword_id="{{keyword.pk}}" class="keyword_update" action="{% url 'hello:keyword_ajax_update' %}" method="POST">
+                        {% csrf_token %}
+                        <input class="keyword_next{{keyword.pk}}" type="text" name="keyword_content" value="{{keyword.content}}">
+                        <input type="hidden" name="keyword_id" value="{{keyword.pk}}">
+                        <input type="submit" value="更新">
+                      </form>
                     </li>
                     <li>
-                      <form action="{% url 'hello:keyword_ajax_delete' %}" method="POST">
+                      <form class="keyword_delete" action="{% url 'hello:keyword_ajax_delete' %}" method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="keyword_id" value="{{keyword.pk}}">
                         <input type="submit" value="削除">
@@ -31,7 +36,12 @@
                   <div>登録されたキーワードはありません。</div>
                 {% endfor %}
           </div>
-          <a href="{% url 'hello:keyword_add' user.pk %}">キーワードを追加</a>
+          <form class="keyword_add" action="{% url 'hello:keyword_ajax_add' %}" method="POST">
+            {% csrf_token %}
+            <p>検索キーワードを追加</p>
+            <input class="keyword_add_line" type="text" name="keyword_content" value="">
+            <input type="submit" value="追加">
+          </form>
           <a href="{% url 'hello:send_date' user.pk %}">メール通知日を確認</a>
         </div>
       </div>
@@ -41,7 +51,82 @@
 
 <script type="text/javascript">
 
-$("form").submit(function(e) {
+function buildHTML(id, content){
+
+var html = `<div class="keyword_cage${id}">
+                  <label for="keyword_hidden_checkbox${id}">${content}</label>
+                  <input type="checkbox" id="keyword_hidden_checkbox${id}">
+                  <ul class="keyword_menu${id}">
+                    <li class="keyword_questioning${id}">「<strong>${content}</strong>」を編集しますか？</li>
+                    <li>
+                      <form data-keyword_id="${id}" class="keyword_update" action="{% url 'hello:keyword_ajax_update' %}" method="POST">
+                        {% csrf_token %}
+                        <input class="keyword_next${id}" type="text" name="keyword_content" value="${content}">
+                        <input type="hidden" name="keyword_id" value="${id}">
+                        <input type="submit" value="更新">
+                      </form>
+                    </li>
+                    <li>
+                      <form class="keyword_delete" action="{% url 'hello:keyword_ajax_delete' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="keyword_id" value="${id}">
+                        <input type="submit" value="削除">
+                      </form>
+                    </li>
+                  </ul>
+                  </div>`
+
+return html;
+}
+
+$(".keyword_add").submit(function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var input = $(".keyword_add_line").val();
+        $.ajax({
+          url: form.prop("action"),
+          method: form.prop("method"),
+          data: form.serialize(),
+          dataType: "text",
+        })
+        .done(function(data) {
+          if (data != 'None') {
+            var html = buildHTML(data, input);
+            $(".keywords_board").append(html);
+            $(".keyword_add_line").val('');
+          }
+        })
+        .fail(function() {
+          alert('キーワード追加に失敗しました。');
+        });
+});
+
+$('.keywords_board').on("submit", ".keyword_update", function (e) {
+        e.preventDefault();
+        var form = $(this);
+        var keyword_id = form.data('keyword_id');
+        $.ajax({
+          url: form.prop("action"),
+          method: form.prop("method"),
+          data: form.serialize(),
+          dataType: "text",
+        })
+        .done(function(data) {
+          if (data) {
+            $(".keyword_questioning" + keyword_id)
+            .html("「<strong>" + data + "</strong>」を編集しますか？");
+            form.parents('.keyword_cage' + keyword_id).find('label')
+            .html(data);
+          } else {
+            form.parents('.keyword_cage' + keyword_id).remove();
+          }
+        })
+        .fail(function() {
+          alert('更新に失敗しました。');
+        });
+});
+
+$('.keywords_board').on("submit", ".keyword_delete", function (e) {
         e.preventDefault();
         var form = $(this);
         $.ajax({
