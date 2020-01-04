@@ -22,6 +22,22 @@ class BooksListView(generic.ListView):
     books = ShowingBooks.objects.all()
     return books
 
+
+def book_ajax_search(request):
+  search_word = request.GET.get("search_word")
+  books = ShowingBooks.objects.all()
+  hit_books = ''
+
+  if search_word:
+    for book in books:
+      if (search_word in book.title or \
+      search_word in book.author):
+        hit_books += book.title + ',' + book.author + ',' + \
+        book.publisher + ',' + \
+        book.publishing_date.strftime('%Y年%m月%d日') + ','
+
+  return HttpResponse(hit_books)
+
 class KeywordsListView(LoginRequiredMixin, generic.ListView):
   model = Keyword
   template_name = 'keyword_list.html'

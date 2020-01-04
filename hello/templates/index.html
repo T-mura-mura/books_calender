@@ -1,39 +1,121 @@
 {% extends "hello_base.html" %}
 {% block title %}Books発売日一覧{% endblock %}
-{% load static %}
 
-      {% block body %}
-      <div id="wrapper">
-        <div id="page-wrapper">
-          <div class="row">
-            <div class="col-lg-6 full-width margin-top-20percent" >
-              <div class="panel panel-default full-width">
+{% block body %}
+  <div>
+    <form id="book-search-field">
+      <p>タイトルか著者で検索できます</p>
+      <input class="book-search-line" type="text" value="">
+    </form>
+  </div>
+  <div id="book-search-result">
 
-                <div class="panel-body full-width full-height">
-                  <table id="book-list-table" class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline full-width">
-                    <thead>
-                      <tr>
-                        <th>タイトル</th>
-                        <th>著者</th>
-                        <th>出版社</th>
-                        <th>発売日</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for book in showingbooks_list %}
-                      <tr>
-                        <td>{{book.title}}</td>
-                        <td>{{book.author}}</td>
-                        <td>{{book.publisher}}</td>
-                        <td>{{book.publishing_date}}</td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {% endblock %}
+  </div>
+  <div class="book_showing_board">
+    <p>発売日一覧</p>
+    <table id="book-list-table">
+      <thead>
+        <tr>
+          <th>タイトル</th>
+          <th>著者</th>
+          <th>出版社</th>
+          <th>発売日</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for book in showingbooks_list %}
+          <tr>
+            <td>{{book.title}}</td>
+            <td>{{book.author}}</td>
+            <td>{{book.publisher}}</td>
+            <td>{{book.publishing_date}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+<script type="text/javascript">
+
+function add_result(multi_results, len){
+
+  var lists = ``
+
+  for (var i = 0; i < len; i++) {
+    lists += `<tr>`;
+    for (j = 0; j < 4; j++) {
+      var one_book = `<td>${multi_results[i][j]}</td>`
+      lists += one_book;
+    }
+    lists += `</tr>`;
+  }
+
+  var html = `
+  <p>検索結果</p>
+  <table>
+      <thead>
+        <tr>
+          <th>タイトル</th>
+          <th>著者</th>
+          <th>出版社</th>
+          <th>発売日</th>
+        </tr>
+      </thead>
+      <tbody>`
+  html += lists;
+
+  var html_tail = `
+    </tbody>
+  </table>`
+
+  html += html_tail;
+
+  return html;
+}
+
+function add_no_result(){
+
+  var html = `<p>一致する結果はありません</p>`
+
+  return html;
+}
+
+$("#book-search-field").on("keyup", function() {
+    var input = $(".book-search-line").val();
+    $.ajax({
+      url: "/book_search",
+      method: "GET",
+      data: {search_word: input},
+      dataType: "text",
+    })
+    .done(function(books) {
+      $("#book-search-result").empty();
+
+      var results = books.split(",");
+      if (results.length !== 1) {
+
+        results.pop();
+        
+        var len = results.length / 4;
+        var multi_results = [];
+        var begin = 0;
+        for (var i = 0; i < len; i++) {
+          multi_results.push(results.slice(begin, begin+4));
+          begin += 4;
+        }
+
+        var html = add_result(multi_results, len);
+        $("#book-search-result").append(html);
+
+      } else  {
+        var html = add_no_result();
+        $("#book-search-result").append(html);
+      }
+    })
+    .fail(function() {
+      alert("通信エラーです。検索結果が表示できません。");
+    });
+});
+
+</script>
+{% endblock %}

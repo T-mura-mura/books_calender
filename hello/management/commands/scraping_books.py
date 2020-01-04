@@ -247,7 +247,7 @@ class Command(BaseCommand):
       if keywords:
         for keyword in keywords:
           for book in books:
-            if (keyword.content in book.title or
+            if (keyword.content in book.title or \
             keyword.content in book.author):
               register = SendingBooks()
               register.user = user

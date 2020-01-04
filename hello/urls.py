@@ -4,6 +4,7 @@ from . import views
 app_name = 'hello'
 urlpatterns = [
   path('', views.BooksListView.as_view(), name="index"),
+  path('book_search/', views.book_ajax_search, name="book_ajax_search"),
   path('<int:pk>/keyword_list/', views.KeywordsListView.as_view(),
   name="keyword_list"),
   path('keyword/ajax_add/', views.keyword_ajax_add,
