@@ -128,6 +128,16 @@ class Command(BaseCommand):
               book.is_send_2nd = True
               book.save()
 
+  def register_sendingbooks(self, user, book):
+    register = SendingBooks()
+    register.user = user
+    register.title = book.title
+    register.author = book.author
+    register.publisher = book.publisher
+    register.publishing_date = book.publishing_date
+    register.save()
+
+  
   def check_unique(self, books):
     for i in range(len(books)-1):
       for j in range(i+1, len(books)):
@@ -147,10 +157,7 @@ class Command(BaseCommand):
 
     for i in range(len(titles)):
       titles[i] = titles[i].string
-      # titleがうまくとれなくてNoneになったときの処置----
-      if titles[i] == None:
-        titles[i] = '<取得失敗> 公式ホームページをご覧ください'
-      # -------------------------------------------
+
     for i in range(len(authors)):
       authors[i] = authors[i].string
       authors[i] = re.findall(r'著：.*\u3000', authors[i])
@@ -166,6 +173,14 @@ class Command(BaseCommand):
     pub_day_month = int(pub_day_month)
     pub_day_day = int(pub_day_day)
     publishing_date = datetime.date(2020, pub_day_month, pub_day_day)
+
+# データの取得に失敗した場合の対処。titleとauthorはnull=falseなのでそのままだと
+# エラーでプログラムが止まる。
+    for i in range(len(titles)):
+      if titles[i] == None:
+        titles[i] = '<取得失敗>'
+      if authors[i] == None:
+        authors[i] = '<取得失敗>'
 
     for i in range(len(titles)):
       if not ShowingBooks.objects.filter(title = titles[i], \
@@ -215,6 +230,14 @@ class Command(BaseCommand):
 
     publisher = 'オーバーラップ文庫'
 
+# データの取得に失敗した場合の対処。titleとauthorはnull=falseなのでそのままだと
+# エラーでプログラムが止まる。
+    for i in range(len(titles)):
+      if titles[i] == None:
+        titles[i] = '<取得失敗>'
+      if authors[i] == None:
+        authors[i] = '<取得失敗>'
+
     for i in range(len(titles)):
       if not ShowingBooks.objects.filter(title = titles[i], \
         author = authors[i], publisher = publisher, \
@@ -247,15 +270,20 @@ class Command(BaseCommand):
       if keywords:
         for keyword in keywords:
           for book in books:
-            if (keyword.content in book.title or \
-            keyword.content in book.author):
-              register = SendingBooks()
-              register.user = user
-              register.title = book.title
-              register.author = book.author
-              register.publisher = book.publisher
-              register.publishing_date = book.publishing_date
-              register.save()
+            title_match = keyword.content in book.title
+            author_match = keyword.content in book.author
+
+            if (title_match and not author_match):
+              if not (book.title == '<取得失敗>'):
+                self.register_sendingbooks(user, book)
+
+            if (author_match and not title_match):
+              if not (book.author == '<取得失敗>'):
+                self.register_sendingbooks(user, book)
+
+            if (author_match and title_match):
+              if not (book.title == book.author == '<取得失敗>'):
+                self.register_sendingbooks(user, book)
               
     for user in users:
       if WhenEmail.objects.filter(user = user):

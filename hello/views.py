@@ -32,11 +32,26 @@ def book_ajax_search(request):
 
   if search_word:
     for book in books:
-      if (search_word in book.title or \
-      search_word in book.author):
-        hit_books += book.title + ',' + book.author + ',' + \
-        book.publisher + ',' + \
-        book.publishing_date.strftime('%Y年%m月%d日') + ','
+      title_match = search_word in book.title
+      author_match = search_word in book.author
+
+      if (title_match and not author_match):
+        if not (book.title == '<取得失敗>'):
+          hit_books += book.title + ',' + book.author + ',' + \
+          book.publisher + ',' + \
+          book.publishing_date.strftime('%Y年%m月%d日') + ','
+
+      if (author_match and not title_match):
+        if not (book.author == '<取得失敗>'):
+          hit_books += book.title + ',' + book.author + ',' + \
+          book.publisher + ',' + \
+          book.publishing_date.strftime('%Y年%m月%d日') + ','
+
+      if (author_match and title_match):
+        if not (book.title == book.author == '<取得失敗>'):
+          hit_books += book.title + ',' + book.author + ',' + \
+          book.publisher + ',' + \
+          book.publishing_date.strftime('%Y年%m月%d日') + ','
 
   hit_books += search_word
 
