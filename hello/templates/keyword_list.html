@@ -10,7 +10,7 @@
           <div class="keywords_board">
                 {% for keyword in keyword_list %}
                   <div class="keyword_cage{{keyword.pk}}">
-                  <label for="keyword_hidden_checkbox{{keyword.pk}}">{{keyword.content}}</label>
+                  <label class="text-like-a" for="keyword_hidden_checkbox{{keyword.pk}}">{{keyword.content}}</label>
                   <input type="checkbox" id="keyword_hidden_checkbox{{keyword.pk}}">
                   <ul class="keyword_menu{{keyword.pk}}">
                     <li class="keyword_questioning{{keyword.pk}}">「<strong>{{keyword.content}}</strong>」を編集しますか？</li>
@@ -50,12 +50,24 @@
 
 <script type="text/javascript">
 
+$(function() {
+  var keyword_ids = [];
+  $(".keyword_update").each(function() {
+    keyword_ids.push($(this).data('keyword_id'));
+  });
+  $.each(keyword_ids, function(i, id) {
+    $("#keyword_hidden_checkbox" + id).addClass("keyword_hidden_checkbox--active");
+    $(".keyword_menu" + id).addClass("keyword_menu--active");
+  })
+  
+});
+
 function buildHTML(id, content){
 
 var html = `<div class="keyword_cage${id}">
-                  <label for="keyword_hidden_checkbox${id}">${content}</label>
-                  <input type="checkbox" id="keyword_hidden_checkbox${id}">
-                  <ul class="keyword_menu${id}">
+                  <label class="text-like-a" for="keyword_hidden_checkbox${id}">${content}</label>
+                  <input type="checkbox" class="keyword_hidden_checkbox--active" id="keyword_hidden_checkbox${id}">
+                  <ul class="keyword_menu${id} keyword_menu--active">
                     <li class="keyword_questioning${id}">「<strong>${content}</strong>」を編集しますか？</li>
                     <li>
                       <form data-keyword_id="${id}" class="keyword_update" action="{% url 'hello:keyword_ajax_update' %}" method="POST">
