@@ -81,16 +81,18 @@ return html;
 $(".keyword_add").submit(function(e) {
         e.preventDefault();
         var form = $(this);
-        var input = $(".keyword_add_line").val();
         $.ajax({
           url: form.prop("action"),
           method: form.prop("method"),
           data: form.serialize(),
           dataType: "text",
         })
-        .done(function(data) {
-          if (data != 'None') {
-            var html = buildHTML(data, input);
+        .done(function(id_content) {
+          if (id_content) {
+            var id_content_list = id_content.split(",");
+            var id = id_content_list[0];
+            var content = id_content_list[1];
+            var html = buildHTML(id, content);
             $(".keywords_board").append(html);
             $(".keyword_add_line").val('');
           }

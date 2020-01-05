@@ -37,7 +37,7 @@
 
 <script type="text/javascript">
 
-function add_result(multi_results, len){
+function add_result(multi_results, len, search_word){
 
   var lists = ``
 
@@ -51,7 +51,7 @@ function add_result(multi_results, len){
   }
 
   var html = `
-  <p>検索結果</p>
+  <p>「${search_word}」の検索結果</p>
   <table>
       <thead>
         <tr>
@@ -73,9 +73,9 @@ function add_result(multi_results, len){
   return html;
 }
 
-function add_no_result(){
+function add_no_result(search_word){
 
-  var html = `<p>一致する結果はありません</p>`
+  var html = `<p>「${search_word}」に一致する結果はありません</p>`
 
   return html;
 }
@@ -94,7 +94,7 @@ $("#book-search-field").on("keyup", function() {
       var results = books.split(",");
       if (results.length !== 1) {
 
-        results.pop();
+        var search_word = results.pop();
         
         var len = results.length / 4;
         var multi_results = [];
@@ -104,11 +104,11 @@ $("#book-search-field").on("keyup", function() {
           begin += 4;
         }
 
-        var html = add_result(multi_results, len);
+        var html = add_result(multi_results, len, search_word);
         $("#book-search-result").append(html);
 
       } else  {
-        var html = add_no_result();
+        var html = add_no_result(results[0]);
         $("#book-search-result").append(html);
       }
     })

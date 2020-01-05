@@ -8,6 +8,7 @@ from accounts.models import CustomUser
 from allauth.account.models import EmailAddress
 from .models import Keyword, WhenEmail, ShowingBooks
 from .forms import WhenEmailAddForm, EmailEditForm
+import re
 
 
 
@@ -25,6 +26,7 @@ class BooksListView(generic.ListView):
 
 def book_ajax_search(request):
   search_word = request.GET.get("search_word")
+  search_word = re.sub(r'\s', '', search_word)
   books = ShowingBooks.objects.all()
   hit_books = ''
 
@@ -35,6 +37,8 @@ def book_ajax_search(request):
         hit_books += book.title + ',' + book.author + ',' + \
         book.publisher + ',' + \
         book.publishing_date.strftime('%Y年%m月%d日') + ','
+
+  hit_books += search_word
 
   return HttpResponse(hit_books)
 
@@ -48,24 +52,23 @@ class KeywordsListView(LoginRequiredMixin, generic.ListView):
 
 
 def keyword_ajax_add(request):
-  keyword_content_pri = request.POST.getlist("keyword_content")
-  keyword_content = keyword_content_pri[0]
+  keyword_content = request.POST.get("keyword_content")
+  keyword_content = re.sub(r'\s', '', keyword_content)
   add_obj = Keyword()
   if keyword_content:
     add_obj.user = request.user
     add_obj.content = keyword_content
     add_obj.save()
-    keyword_id = add_obj.pk
+    id_content = str(add_obj.pk) + ',' + keyword_content
   else:
-    keyword_id = None
+    id_content = ''
 
-  return HttpResponse(keyword_id)
+  return HttpResponse(id_content)
 
 def keyword_ajax_update(request):
-  keyword_id_pri = request.POST.getlist("keyword_id")
-  keyword_id = keyword_id_pri[0]
-  keyword_content_pri = request.POST.getlist("keyword_content")
-  keyword_content = keyword_content_pri[0]
+  keyword_id = request.POST.get("keyword_id")
+  keyword_content = request.POST.get("keyword_content")
+  keyword_content = re.sub(r'\s', '', keyword_content)
   upd_obj = Keyword.objects.get(id = keyword_id)
   if keyword_content:
     upd_obj.content = keyword_content
@@ -76,9 +79,8 @@ def keyword_ajax_update(request):
   return HttpResponse(keyword_content)
 
 def keyword_ajax_delete(request):
-  keyword_id_pri = request.POST.getlist("keyword_id")
-  keyword_id = keyword_id_pri[0]
-  del_obj = Keyword.objects.filter(id = keyword_id)
+  keyword_id = request.POST.get("keyword_id")
+  del_obj = Keyword.objects.get(id = keyword_id)
   del_obj.delete()
   return HttpResponse(keyword_id)
 
