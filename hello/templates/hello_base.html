@@ -9,31 +9,41 @@
     <meta name="author" content="">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <link rel="stylesheet" href="{% sass_src 'hello/keyword_list.scss' %}">
+    <link rel="stylesheet" href="{% sass_src 'hello/hello_base.scss' %}">
+    <link rel="stylesheet" href="{% sass_src 'hello/index.scss' %}">
 
     <title>{% block title %}{% endblock %}</title>
 
   </head>
   <body>
-    <div id="wrapper">
+    <div class="content">
       {% if messages %}
         {% for message in messages %}
-          <div>{{message}}</div>
+          <div class="notices">{{message}}</div>
         {% endfor %}
       {% endif %}
-      <nav class="navbar navbar-default navbar-static-top manager-nav no-margin" role="navigation">
-          <div class="sidebar-nav navbar-collapse">
-              {% if user.is_authenticated %}
-              <p>{{ user.username }}さん、こんにちは。</p>
-                <a href="{% url 'hello:keyword_list' user.pk %}">キーワード一覧</a>
-                <a href="{% url 'hello:index' %}">本一覧</a>
-                <a href="{% url 'hello:email_list' user.id %}">メールアドレス編集</a>
-                <a href="{% url 'account_logout' %}"><i class="fa fa-bar-chart"></i>  ログアウト</a>
-              {% else %}
-              <p>こんにちは、来訪者さん。</p>
-              <a href="{% url 'account_signup' %}"><i class="fa fa-bar-chart"></i>  新規登録 </a>
-                <a href="{% url 'account_login' %}"><i class="fa fa-bar-chart"></i>  ログイン </a>
-              {% endif %}
-          </div>
+      <nav class="header">
+        <h1>新刊発売日一覧</h1>
+        <div class="header__description">当サイトでは、いくつかの出版社様
+          から発売の近い本の紹介をしております。ユーザー登録していただければ、
+          検索ワードにヒットする新刊の情報をメールで通知するサービスがございます。
+        </div>
+        {% if user.is_authenticated %}
+        <p>現在{{ user.username }}様でログインしています</p>
+        <ul class="header__menu">
+          <li><a href="{% url 'hello:keyword_list' user.pk %}">検索キーワード一覧</a></li>
+          <li><a href="{% url 'hello:index' %}">本一覧</a></li>
+          <li><a href="{% url 'hello:send_date' user.pk %}">メール通知日設定</a></li>
+          <li><a href="{% url 'hello:email_list' user.id %}">メールアドレス編集</a></li>
+          <li><a href="{% url 'account_logout' %}">ログアウト</a></li>
+        </ul>
+        {% else %}
+        <p>ログインされていません</p>
+        <ul class="header__menu_when_logged_off">
+          <li><a href="{% url 'account_signup' %}">新規登録</a></li>
+          <li><a href="{% url 'account_login' %}">ログイン</a></li>
+        {% endif %}
+        </ul>
       </nav>
       {% block body %}
       {% endblock %}

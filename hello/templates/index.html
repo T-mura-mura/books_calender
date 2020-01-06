@@ -1,19 +1,18 @@
 {% extends "hello_base.html" %}
-{% block title %}Books発売日一覧{% endblock %}
+{% block title %}新刊発売日一覧{% endblock %}
 
 {% block body %}
-  <div>
-    <form id="book-search-field">
-      <p>タイトルか著者で検索できます</p>
-      <input class="book-search-line" type="text" value="">
-    </form>
-  </div>
+<div class="middle">
+  <form id="book-search-field">
+    <p>タイトルか著者名で検索ができます</p>
+    <input class="book-search-line" type="text" placeholder="検索キーワードを入力" value="">
+  </form>
   <div id="book-search-result">
 
   </div>
-  <div class="book_showing_board">
-    <p>発売日一覧</p>
-    <table id="book-list-table">
+  <div class="middle__content">
+    <h3>発売日一覧</h3>
+    <table>
       <thead>
         <tr>
           <th>タイトル</th>
@@ -34,6 +33,7 @@
       </tbody>
     </table>
   </div>
+</div>
 
 <script type="text/javascript">
 
@@ -53,15 +53,15 @@ function add_result(multi_results, len, search_word){
   var html = `
   <p>「${search_word}」の検索結果</p>
   <table>
-      <thead>
-        <tr>
-          <th>タイトル</th>
-          <th>著者</th>
-          <th>出版社</th>
-          <th>発売日</th>
-        </tr>
-      </thead>
-      <tbody>`
+    <thead>
+      <tr>
+        <th>タイトル</th>
+        <th>著者</th>
+        <th>出版社</th>
+        <th>発売日</th>
+      </tr>
+    </thead>
+    <tbody>`
   html += lists;
 
   var html_tail = `
