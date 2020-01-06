@@ -2,23 +2,26 @@
 <html lang="ja">
 
   <head>
-
+    {% load static %}
+    {% load sass_tags %}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <link rel="stylesheet" href="{% sass_src 'accounts/login.scss' %}">
 
-    <title>Login</title>
+    <title>ログイン</title>
 
   </head>
 
   <body>
-      <form method="post" action="{% url 'account_login' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">ログイン</button>
-        <a href="/"><i class="fa fa-bar-chart"></i> ログインせずに進む </a>
-      </form>
+    <h1>ログイン</h1>
+    <form method="post" action="{% url 'account_login' %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">ログイン</button>
+    </form>
+    <a href="/"><i class="fa fa-bar-chart"></i> ログインせずに進む</a>
   </body>
 </html>

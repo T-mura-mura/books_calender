@@ -1,0 +1,44 @@
+body {
+  h1 {
+    text-align: center;
+  }
+  p {
+    text-align: center;
+    input {
+      width: 250px;
+      height: 30px;
+      font-size: 18px;
+      padding: 5px;
+      border: 1px solid black;
+      margin: 0 auto;
+      display: block;
+    }
+  }
+  p:last-of-type {
+    display: none;
+  }
+
+  ul {
+    padding: 0px;
+    display: flex;
+    justify-content: center;
+    li {
+      list-style: none;
+      color: red;
+    }
+  }
+  button {
+    margin: 50px auto;
+    display: block;
+    width: 300px;
+    height: 50px;
+    font-size: 18px;
+  }
+  a {
+    display: block;
+    width: 150px;
+    margin: 0 auto;
+    text-align: center;
+
+  }
+}

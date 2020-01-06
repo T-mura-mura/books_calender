@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-
 <html lang="ja">
-
   <head>
-
+    {% load static %}
+    {% load sass_tags %}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <link rel="stylesheet" href="{% sass_src 'accounts/signup.scss' %}">
 
-    <title>Login</title>
+    <title>新規登録</title>
 
   </head>
 
@@ -23,7 +23,7 @@
       {% if redirect_field_value %}
       <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
       {% endif %}
-      <button type="submit">登録 &raquo;</button>
+      <button type="submit">登録</button>
     </form>
   </body>
 </html>
