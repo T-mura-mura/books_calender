@@ -8,9 +8,14 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="{% sass_src 'hello/keyword_list.scss' %}">
     <link rel="stylesheet" href="{% sass_src 'hello/hello_base.scss' %}">
     <link rel="stylesheet" href="{% sass_src 'hello/index.scss' %}">
+    <link rel="stylesheet" href="{% sass_src 'hello/keyword_list.scss' %}">
+    <link rel="stylesheet" href="{% sass_src 'hello/send_date.scss' %}">
+    <link rel="stylesheet" href="{% sass_src 'hello/send_set.scss' %}">
+    <link rel="stylesheet" href="{% sass_src 'hello/send_change.scss' %}">
+    <link rel="stylesheet" href="{% sass_src 'hello/send_delete.scss' %}">
+
 
     <title>{% block title %}{% endblock %}</title>
 
@@ -24,9 +29,7 @@
       {% endif %}
       <nav class="header">
         <h1>新刊発売日一覧</h1>
-        <div class="header__description">当サイトでは、いくつかの出版社様
-          から発売の近い本の紹介をしております。ユーザー登録していただければ、
-          検索ワードにヒットする新刊の情報をメールで通知するサービスがございます。
+        <div class="header__description">当サイトでは、いくつかの出版社様から発売の近い本の紹介をしております。ユーザー登録していただければ、検索ワードにヒットする新刊の情報をメールで通知するサービスがございます。
         </div>
         {% if user.is_authenticated %}
         <p>現在{{ user.username }}様でログインしています</p>

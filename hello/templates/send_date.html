@@ -1,37 +1,29 @@
 {% extends "hello_base.html" %}
 {% block title %}メール通知日{% endblock %}
-{% load static %}
 
 {% block body %}
-<div id="wrapper">
-  <div id="page-wrapper">
-    <div class="row">
-      <div class="col-lg-6 full-width margin-top-20percent" >
-        <div class="panel panel-default full-width">
-          <div class="panel-body full-width full-height">
-            {% for when in whenemail_list %}
-              {% if when.date_email == 0 %}
-                <div>キーワードに合致する本の発売を、発売日当日にお知らせします</div>
-              {% else %}
-                <div>キーワードに合致する本の発売を、発売日の{{ when.date_email }}日前にお知らせします</div>
-              {% endif %}
-              {% if when.date_reminder != None %}
-                {% if when.date_reminder == 0 %}
-                  <div>直前のリマインダーは発売日当日にお送りします</div>
-                {% else %}
-                  <div>直前のリマインダーは発売の{{ when.date_reminder }}日前にお送りします</div>
-                {% endif %}
-              {% endif %}
-              <a href="{% url 'hello:send_change' user.id when.pk %}">既存のメール通知日を変更</a>
-              <a href="{% url 'hello:send_delete' user.id when.pk %}">メール通知をしないようにする</a>
-            {% empty %}
-              <div>登録されたメール通知日設定はありません。</div>
-              <a href="{% url 'hello:send_set' user.pk %}">メール通知日を設定</a>
-            {% endfor %}
-          </div>
-        </div>
+
+<div class="send_date">
+  {% for when in whenemail_list %}
+    {% if when.date_email == 0 %}
+      <div>検索ワードに合致する本の発売を、発売日<span>当日</span>にお知らせします</div>
+    {% else %}
+      <div>検索ワードに合致する本の発売を、発売日の<span>{{ when.date_email }}</span>日前から、発売が分かり次第お知らせいたします
       </div>
-    </div>
-  </div>
+    {% endif %}
+    {% if when.date_reminder != None %}
+      {% if when.date_reminder == 0 %}
+        <div>リマインダーは発売日<span>当日</span>にお送りします</div>
+      {% else %}
+        <div>リマインダーは発売の<span>{{ when.date_reminder }}</span>日前から、発売が分かり次第お送りします
+        </div>
+      {% endif %}
+    {% endif %}
+    <div><a href="{% url 'hello:send_change' user.id when.pk %}">既存のメール通知日を変更</a></div>
+    <div><a href="{% url 'hello:send_delete' user.id when.pk %}">メール通知をしないようにする</a></div>
+  {% empty %}
+    <div>登録されたメール通知日設定はありません</div>
+    <div><a href="{% url 'hello:send_set' user.pk %}">メール通知日を設定</a></div>
+  {% endfor %}
 </div>
 {% endblock %}

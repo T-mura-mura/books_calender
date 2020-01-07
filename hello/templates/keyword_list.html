@@ -1,51 +1,46 @@
 {% extends "hello_base.html" %}
-{% block title %}キーワードリスト{% endblock %}
+{% block title %}検索ワードリスト{% endblock %}
 
 {% block body %}
-<div id="wrapper">
-  <div id="page-wrapper">
-    <div class="row">
-      <div class="col-lg-6 full-width margin-top-20percent" >
-        <div class="panel panel-default full-width">
-          <div class="keywords_board">
-                {% for keyword in keyword_list %}
-                  <div class="keyword_cage{{keyword.pk}}">
-                  <label class="text-like-a" for="keyword_hidden_checkbox{{keyword.pk}}">{{keyword.content}}</label>
-                  <input type="checkbox" id="keyword_hidden_checkbox{{keyword.pk}}">
-                  <ul class="keyword_menu{{keyword.pk}}">
-                    <li class="keyword_questioning{{keyword.pk}}">「<strong>{{keyword.content}}</strong>」を編集しますか？</li>
-                    <li>
-                      <form data-keyword_id="{{keyword.pk}}" class="keyword_update" action="{% url 'hello:keyword_ajax_update' %}" method="POST">
-                        {% csrf_token %}
-                        <input class="keyword_next{{keyword.pk}}" type="text" name="keyword_content" value="{{keyword.content}}">
-                        <input type="hidden" name="keyword_id" value="{{keyword.pk}}">
-                        <input type="submit" value="更新">
-                      </form>
-                    </li>
-                    <li>
-                      <form class="keyword_delete" action="{% url 'hello:keyword_ajax_delete' %}" method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" name="keyword_id" value="{{keyword.pk}}">
-                        <input type="submit" value="削除">
-                      </form>
-                    </li>
-                  </ul>
-                  </div>
-                {% empty %}
-                  <div>登録されたキーワードはありません。</div>
-                {% endfor %}
-          </div>
-          <form class="keyword_add" action="{% url 'hello:keyword_ajax_add' %}" method="POST">
-            {% csrf_token %}
-            <p>検索キーワードを追加</p>
-            <input class="keyword_add_line" type="text" name="keyword_content" value="">
-            <input type="submit" value="追加">
-          </form>
-          <a href="{% url 'hello:send_date' user.pk %}">メール通知日を確認</a>
-        </div>
-      </div>
-    </div>
+<div class="keyword_list">
+  <div class="keyword_description">こちらで検索キーワードを登録した上で、メール通知日設定を行うと、検索ワードに合致する本の発売を、設定した通知日に基づいてメールでお知らせいたします。
   </div>
+  <p>現在登録されている検索ワード一覧</p>
+  <div class="keywords_board">
+    {% for keyword in keyword_list %}
+    <div class="keyword_cage{{keyword.pk}}">
+      <label class="text-like-a" for="keyword_hidden_checkbox{{keyword.pk}}">{{keyword.content}}</label>
+      <input type="checkbox" id="keyword_hidden_checkbox{{keyword.pk}}">
+      <ul class="keyword_menu{{keyword.pk}}">
+        <li class="keyword_questioning{{keyword.pk}}">「<strong>{{keyword.content}}</strong>」を編集しますか？</li>
+        <li>
+          <form data-keyword_id="{{keyword.pk}}" class="keyword_update" action="{% url 'hello:keyword_ajax_update' %}" method="POST">
+            {% csrf_token %}
+            <input class="keyword_next{{keyword.pk}}" type="text" name="keyword_content" value="{{keyword.content}}">
+            <input type="hidden" name="keyword_id" value="{{keyword.pk}}">
+            <input type="submit" value="更新">
+          </form>
+        </li>
+        <li>
+          <form class="keyword_delete" action="{% url 'hello:keyword_ajax_delete' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="keyword_id" value="{{keyword.pk}}">
+            <input type="submit" value="削除">
+          </form>
+        </li>
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+  <form class="keyword_add" action="{% url 'hello:keyword_ajax_add' %}" method="POST">
+    {% csrf_token %}
+    <p>検索キーワードを追加</p>
+    <div>
+    <input class="keyword_add_line" type="text" name="keyword_content" value="">
+    <input type="submit" value="追加">
+    </div>
+  </form>
+  <div class="check_email_send"><a href="{% url 'hello:send_date' user.pk %}">メール通知日を確認</a></div>
 </div>
 
 <script type="text/javascript">

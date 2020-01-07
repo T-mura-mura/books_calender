@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "send_delete.css",
+	"sources": [
+		"send_delete.scss"
+	],
+	"names": [],
+	"mappings": "AAAA,AAEI,QAFI,CACN,YAAY,CACV,CAAC,AAAC,CACA,UAAU,CAAE,MAAM,CAClB,UAAU,CAAE,IAAI,CACjB,AALL,AAOM,QAPE,CACN,YAAY,CAKV,IAAI,CACF,GAAG,AAAC,CACF,KAAK,CAAE,KAAK,CACZ,MAAM,CAAE,MAAM,CACd,UAAU,CAAE,IAAI,CAChB,UAAU,CAAE,MAAM,CACnB"
+}

@@ -1,3 +1,44 @@
+.content {
+  .keyword_list {
+    .keyword_description {
+      width: 70%;
+      margin: 0 auto;
+    }
+    p {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .keywords_board {
+      width: 30%;
+      margin-left: 44%;
+      margin-top: 30px;
+      div {
+        ul {
+          padding: 0;
+        }
+      }
+    }
+    form {
+      p {
+        text-align: center;
+      }
+      div {
+        width: 175px;
+        margin: 0 auto;
+      }
+    }
+    .check_email_send {
+      width: 300px;
+      margin-top: 30px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      
+    }
+  }
+}
+
+
 .text-like-a {
   cursor: pointer;
   color: #0000ff;

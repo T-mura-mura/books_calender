@@ -1,24 +1,17 @@
 {% extends "hello_base.html" %}
-{% block title %}メール通知日を設定{% endblock %}
-{% load static %}
+{% block title %}メール通知日設定{% endblock %}
 
 {% block body %}
-<div id="wrapper">
-  <div id="page-wrapper">
-    <div class="row">
-      <div class="col-lg-6 full-width margin-top-20percent" >
-        <div class="panel panel-default full-width">
-          <form method="POST">
-            {% csrf_token %}
-            <table>
-              {{ form.as_table }}
-            </table>
-            <button type="submit">登録</button>
-            <a href="{% url 'hello:send_date' user.pk %}">キャンセル</a>
-          </form>
-        </div>
-      </div>
-    </div>
+<div class="send_set">
+  <div>検索ワードに合致した本について、その発売日の何日前にメールで通知して欲しいか入力してください（当日通知して欲しい場合は、0を入力してください）。メールは、１通目と、リマインダーで計２通送れますが、リマインダーの欄は空白のままにすることで、１通目だけを送ることもできます。
   </div>
+  <form method="POST">
+    {% csrf_token %}
+      {{ form.as_p }}
+    <div>
+    <button type="submit">登録</button>
+    <a href="{% url 'hello:send_date' user.pk %}">キャンセル</a>
+    </div>
+  </form>
 </div>
 {% endblock %}

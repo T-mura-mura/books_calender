@@ -1,0 +1,35 @@
+.content {
+  .send_set {
+    div {
+      width: 70%;
+      margin: 0 auto;
+      margin-top: 30px;
+    }
+    form {
+      margin-top: 30px;
+      p {
+        text-align: center;
+        label {
+          font-size: 18px;
+        }
+        input {
+          font-size: 18px;
+        }
+      }
+      ul {
+        padding: 0px;
+        display: flex;
+        justify-content: center;
+        li {
+          list-style: none;
+          color: red;
+        }
+      }
+      div {
+        width: 300px;
+        margin: 0 auto;
+        text-align: center;
+      }
+    }
+  }
+}
