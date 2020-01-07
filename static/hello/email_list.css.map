@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "email_list.css",
+	"sources": [
+		"email_list.scss"
+	],
+	"names": [],
+	"mappings": "AAAA,AAEI,QAFI,CACN,WAAW,CACT,GAAG,AAAC,CACF,KAAK,CAAE,GAAG,CACV,MAAM,CAAE,MAAM,CACd,UAAU,CAAE,IAAI,CAChB,UAAU,CAAE,MAAM,CACnB"
+}

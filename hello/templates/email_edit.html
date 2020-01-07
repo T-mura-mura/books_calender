@@ -1,24 +1,15 @@
 {% extends "hello_base.html" %}
-{% block title %}メールアドレスを編集{% endblock %}
-{% load static %}
+{% block title %}メールアドレス編集{% endblock %}
 
 {% block body %}
-<div id="wrapper">
-  <div id="page-wrapper">
-    <div class="row">
-      <div class="col-lg-6 full-width margin-top-20percent" >
-        <div class="panel panel-default full-width">
-          <form method="POST">
-            {% csrf_token %}
-            <table>
-              {{ form.as_table }}
-            </table>
-            <button type="submit">更新</button>
-            <a href="{% url 'hello:index' %}">キャンセル</a>
-          </form>
-        </div>
-      </div>
+<div class="email_edit">
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div>
+      <button type="submit">更新</button>
+      <a href="{% url 'hello:index' %}">キャンセル</a>
     </div>
-  </div>
+  </form>
 </div>
 {% endblock %}

@@ -4,6 +4,7 @@
 {% block body %}
 
 <div class="send_date">
+  <div>ここでは、キーワードに合致する本の発売日の何日前にお知らせメールを送るかを設定できます。</div>
   {% for when in whenemail_list %}
     {% if when.date_email == 0 %}
       <div>検索ワードに合致する本の発売を、発売日<span>当日</span>にお知らせします</div>
