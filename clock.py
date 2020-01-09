@@ -3,7 +3,7 @@ import subprocess
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', minutes=20)
+@sched.scheduled_job('interval', minutes=5)
 def timed_job():
   cmd = "curl https://books-date.herokuapp.com/"
   subprocess.call(cmd.split())
