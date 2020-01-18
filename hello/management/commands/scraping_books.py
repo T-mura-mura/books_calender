@@ -148,51 +148,51 @@ class Command(BaseCommand):
 
           books[j].is_overlapping = True
 
-  def scraping_gagaga(self):
-    html = requests.get('https://gagagabunko.jp/newrelease/index.html')
+
+  def scraping_ga(self):
+    html = requests.get('https://ga.sbcr.jp/novel/contents/index.html')
     soup = BeautifulSoup(html.content, "html.parser")
-    
-    titles = soup.select("#contBg2 > div > h3")
-    authors = soup.select("#contBg2 > div > p")
+    titles = soup.select("#content > .book > h3 > a")
+    authors = soup.select("#content > .book > p.name")
+    pub_day = soup.select("#content > .book > p.code")
 
     for i in range(len(titles)):
-      titles[i] = titles[i].string
-
-    for i in range(len(authors)):
-      authors[i] = authors[i].string
-      authors[i] = re.findall(r'著：.*\u3000', authors[i])
-      authors[i] = authors[i][0][2:-1]
-    authors = authors[0:len(titles)]
-    publisher = 'ガガガ文庫'
-    pub_day = soup.select("#contBg2 > div.heading > \
-    span.headingReleasedate")[0].string
-    pub_day = re.findall(r'\d月\d+日', pub_day)
-    pub_day_month = re.sub(r'月\d+日', '', pub_day[0])
-    pub_day_proc = re.sub(r'\d月', '', pub_day[0])
-    pub_day_day = re.sub(r'日', '', pub_day_proc)
-    pub_day_month = int(pub_day_month)
-    pub_day_day = int(pub_day_day)
-    publishing_date = datetime.date(2020, pub_day_month, pub_day_day)
-
-# データの取得に失敗した場合の対処。titleとauthorはnull=falseなのでそのままだと
-# エラーでプログラムが止まる。
-    for i in range(len(titles)):
+      # Noneに.stringを使ったりデータベースに入れるとエラーになるので
       if titles[i] == None:
         titles[i] = '<取得失敗>'
+      else:
+        titles[i] = titles[i].string
+
+    for i in range(len(authors)):
+      # Noneに正規表現の処理re.subなどを使うとエラーになるので
       if authors[i] == None:
         authors[i] = '<取得失敗>'
+      else:
+        authors[i] = authors[i].string
+        authors[i] = re.sub(r'　.+', '', authors[i])
+
+    publishing_date = [None] * len(pub_day)
+    for i in range(len(pub_day)):
+      pub_day[i] = pub_day[i].text
+      pub_day[i] = re.findall(r'\d+/\d+/\d+', pub_day[i])
+      publishing_date[i] = datetime.datetime.strptime(pub_day[i][0], '%Y/%m/%d')
+      publishing_date[i] = datetime.date(publishing_date[i].year, \
+        publishing_date[i].month, publishing_date[i].day)
+
+    publisher = 'GA文庫'
 
     for i in range(len(titles)):
       if not ShowingBooks.objects.filter(title = titles[i], \
         author = authors[i], publisher = publisher, \
-        publishing_date = publishing_date):
+        publishing_date = publishing_date[i]):
         
         book = ShowingBooks()
         book.title = titles[i]
         book.author = authors[i]
         book.publisher = publisher
-        book.publishing_date = publishing_date
+        book.publishing_date = publishing_date[i]
         book.save()
+
 
   def scraping_overlap(self):
     html = requests.get('https://over-lap.co.jp/lnv/')
@@ -202,11 +202,19 @@ class Command(BaseCommand):
     pub_day = soup.select("#lightnovel_next small.info > span")
 
     for i in range(len(titles)):
-      titles[i] = titles[i].string
-      titles[i] = re.sub(r'\r|\n|\s{2,}', '', titles[i])
+      # Noneに正規表現の処理re.subなどを使うとエラーになるので
+      if titles[i] == None:
+        titles[i] = '<取得失敗>'
+      else:
+        titles[i] = titles[i].string
+        titles[i] = re.sub(r'\r|\n|\s{2,}', '', titles[i])
 
     for i in range(len(authors)):
-      authors[i] = authors[i].string
+      # Noneに.stringを使ったりデータベースに入れるとエラーになるので
+      if authors[i] == None:
+        authors[i] = '<取得失敗>'
+      else:
+        authors[i] = authors[i].string
 
     pub_day_year = [None] * len(pub_day)
     pub_day_month = [None] * len(pub_day)
@@ -230,14 +238,6 @@ class Command(BaseCommand):
 
     publisher = 'オーバーラップ文庫'
 
-# データの取得に失敗した場合の対処。titleとauthorはnull=falseなのでそのままだと
-# エラーでプログラムが止まる。
-    for i in range(len(titles)):
-      if titles[i] == None:
-        titles[i] = '<取得失敗>'
-      if authors[i] == None:
-        authors[i] = '<取得失敗>'
-
     for i in range(len(titles)):
       if not ShowingBooks.objects.filter(title = titles[i], \
         author = authors[i], publisher = publisher, \
@@ -253,15 +253,15 @@ class Command(BaseCommand):
 
   def handle(self, *args, **options):
 
+    self.scraping_ga()
+    self.scraping_overlap()
+
     showing_books = ShowingBooks.objects.all()
     today = datetime.date.today()
     days0 = datetime.timedelta(days = 0)
     for book in showing_books:
       if book.publishing_date - today < days0:
         book.delete()
-
-    self.scraping_gagaga()
-    self.scraping_overlap()
 
     users = CustomUser.objects.all()
     books = ShowingBooks.objects.all()
